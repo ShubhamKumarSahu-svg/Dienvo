@@ -11,6 +11,7 @@ Dienvo is built on a modern, decoupled architecture connecting client-side state
 ### 1. High-Level Technical Architecture
 
 ```mermaid
+%%{init: {'theme': 'neutral'}}%%
 graph TD
     User([Student / Explorer]) <--> |Real-Time Audio & Web UI| FE[Next.js Client Components]
     
@@ -26,17 +27,12 @@ graph TD
         Vapi[Vapi Real-time Voice API] <--> |WebRTC Voice Stream| VapiClient
         Supabase[(Supabase Database)] <--> |Postgres Query Pipeline| DBClient
     end
-    
-    style FE fill:#e0f7fa,stroke:#00acc1,stroke-width:2px
-    style SA fill:#e8eaf6,stroke:#3f51b5,stroke-width:2px
-    style Clerk fill:#fce4ec,stroke:#e91e63,stroke-width:2px
-    style Supabase fill:#efebe9,stroke:#5d4037,stroke-width:2px
-    style Vapi fill:#efe8ff,stroke:#6200ea,stroke-width:2px
 ```
 
 ### 2. Live Session & Data Lifecycle
 
 ```mermaid
+%%{init: {'theme': 'neutral'}}%%
 sequenceDiagram
     autonumber
     actor User as Student
@@ -75,6 +71,7 @@ sequenceDiagram
 To maintain secure tenant isolation, Dienvo coordinates Clerk JWT identification tokens with Next.js Server Actions and Supabase Row Level Security (RLS) policies:
 
 ```mermaid
+%%{init: {'theme': 'neutral'}}%%
 sequenceDiagram
     participant Client as Next.js Client (Browser)
     participant Clerk as Clerk Identity Provider
@@ -105,6 +102,7 @@ sequenceDiagram
 The schema defines two core tables with index optimizations targeting search and query performance on user IDs.
 
 ```mermaid
+%%{init: {'theme': 'neutral'}}%%
 erDiagram
     COMPANIONS {
         uuid id PK "Primary Key (Auto-Generated)"
@@ -137,6 +135,7 @@ erDiagram
 The Voice Session Client manages real-time WebRTC audio events through Vapi Web SDK state triggers:
 
 ```mermaid
+%%{init: {'theme': 'neutral'}}%%
 stateDiagram-v2
     [*] --> Disconnected : Client Mounts
     Disconnected --> Connecting : Click "Start Live Mic" / init Vapi SDK
@@ -148,12 +147,12 @@ stateDiagram-v2
         Speaking_User --> Idle : Vapi fires "speech-end"
         Idle --> Speaking_Assistant : Vapi fires "speech-start" (assistant speaking)
         Speaking_Assistant --> Idle : Vapi fires "speech-end"
-        
-        note right of Connected
-            - Volume event handles pulse micro-animations
-            - Message event updates transcript stream
-        end
     }
+
+    note right of Connected
+        Volume and transcript message events
+        are handled dynamically in state callbacks.
+    end note
 
     Connected --> Disconnected : Click "Stop Session" / fires "call-ended"
     Disconnected --> [*] : Component unmounts / saveSessionData() triggered
